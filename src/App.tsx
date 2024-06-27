@@ -16,7 +16,7 @@ type SectionProps = PropsWithChildren<{
 
 function App(): React.JSX.Element {
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}>
+    <SafeAreaView style={{flex: 1, backgroundColor: '#F8F9FA'}}>
       <AppNavigator />
     </SafeAreaView>
   );

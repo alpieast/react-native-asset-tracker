@@ -33,27 +33,34 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
+    marginBottom: 8,
+    backgroundColor: '#fff',
+    height: 72,
+    shadowColor: '#000000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+    borderRadius: 8,
   },
   icon: {
     width: 40,
     height: 40,
-    marginRight: 12,
+    margin: 16,
   },
   infoContainer: {
     flex: 1,
   },
   name: {
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: 14,
+    fontWeight: '600',
   },
   symbol: {
     color: '#666',
   },
   priceContainer: {
     alignItems: 'flex-end',
+    marginRight: 14,
   },
   price: {
     fontSize: 16,

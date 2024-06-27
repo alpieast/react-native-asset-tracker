@@ -20,7 +20,7 @@ const mockData: AssetType[] = [
     price: '₹2,509.75',
     change: '+9.77%',
     changeColor: 'green',
-    icon: 'https://example.com/bitcoin.png',
+    icon: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1.png',
   },
   {
     id: '2',
@@ -29,7 +29,7 @@ const mockData: AssetType[] = [
     price: '₹2,509.75',
     change: '-21.00%',
     changeColor: 'red',
-    icon: 'https://example.com/ethereum.png',
+    icon: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png',
   },
   {
     id: '3',
@@ -38,7 +38,7 @@ const mockData: AssetType[] = [
     price: '₹553.06',
     change: '-22.97%',
     changeColor: 'red',
-    icon: 'https://example.com/band.png',
+    icon: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1808.png',
   },
   {
     id: '4',
@@ -47,7 +47,7 @@ const mockData: AssetType[] = [
     price: '₹105.06',
     change: '+16.31%',
     changeColor: 'green',
-    icon: 'https://example.com/cardano.png',
+    icon: 'https://s2.coinmarketcap.com/static/img/coins/64x64/2010.png',
   },
   {
     id: '5',
@@ -56,7 +56,7 @@ const mockData: AssetType[] = [
     price: '₹5.29',
     change: '-16.58%',
     changeColor: 'red',
-    icon: 'https://example.com/tron.png',
+    icon: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1958.png',
   },
   {
     id: '6',
@@ -65,7 +65,7 @@ const mockData: AssetType[] = [
     price: '₹73.00',
     change: '+0.07%',
     changeColor: 'green',
-    icon: 'https://example.com/tether.png',
+    icon: 'https://s2.coinmarketcap.com/static/img/coins/64x64/825.png',
   },
   {
     id: '7',
@@ -74,7 +74,7 @@ const mockData: AssetType[] = [
     price: '₹23.39',
     change: '+21.00%',
     changeColor: 'green',
-    icon: 'https://example.com/dogecoin.png',
+    icon: 'https://s2.coinmarketcap.com/static/img/coins/64x64/74.png',
   },
 ];
 
@@ -89,6 +89,7 @@ const AssetsList = () => {
         data={mockData}
         renderItem={renderItem}
         keyExtractor={item => item.id}
+        style={styles.flatList}
       />
     </View>
   );
@@ -97,12 +98,18 @@ const AssetsList = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#F8F9FA',
+    paddingTop: 12,
+    padding: 16,
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    padding: 16,
+    fontSize: 20,
+    lineHeight: 20,
+    fontWeight: '700',
+  },
+  flatList: {
+    flex: 1,
+    paddingTop: 16,
   },
 });
 
