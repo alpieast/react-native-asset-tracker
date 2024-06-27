@@ -3,8 +3,9 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import AssetsScreen from '../screens/AssetsScreen';
 import AssetDetailScreen from '../screens/AssetDetailScreen';
+import {RootStackParamList} from './types';
 
-const Stack = createStackNavigator();
+const Stack = createStackNavigator<RootStackParamList>();
 
 const AppNavigator = () => {
   return (
@@ -16,7 +17,7 @@ const AppNavigator = () => {
           options={{title: 'Assets', headerShown: false}}
         />
         <Stack.Screen
-          name="AssetDetail"
+          name="AssetDetailScreen"
           component={AssetDetailScreen}
           options={{title: 'Asset Detail'}}
         />
