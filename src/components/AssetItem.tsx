@@ -1,27 +1,37 @@
 import React from 'react';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {TouchableOpacity, View, Text, StyleSheet, Image} from 'react-native';
-import {AssetType} from '../screens/AssetsScreen';
 import {RootStackParamList} from '../navigation/types';
+import {CoinData} from '../services/types';
 
-const AssetItem = ({asset}: {asset: AssetType}) => {
+const AssetItem = ({asset}: {asset: CoinData}) => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const onPress = () => {
     navigation.navigate('AssetDetailScreen', {asset});
   };
 
+  const assetIcon: string = `https://s2.coinmarketcap.com/static/img/coins/64x64/${asset.id}.png`;
+
+  const assetPrice: string = asset.quote.USD.price.toFixed(2);
+  const assetChange: string =
+    asset.quote.USD.percent_change_24h.toFixed(2) + '%';
+
   return (
     <TouchableOpacity onPress={onPress}>
       <View style={styles.container}>
-        <Image source={{uri: asset.icon}} style={styles.icon} />
+        <Image source={{uri: assetIcon}} style={styles.icon} />
         <View style={styles.infoContainer}>
           <Text style={styles.name}>{asset.name}</Text>
           <Text style={styles.symbol}>{asset.symbol}</Text>
         </View>
         <View style={styles.priceContainer}>
-          <Text style={styles.price}>{asset.price}</Text>
-          <Text style={[styles.change, {color: asset.changeColor}]}>
-            {asset.change}
+          <Text style={styles.price}>{assetPrice}</Text>
+          <Text
+            style={[
+              styles.change,
+              {color: asset.quote.USD.percent_change_24h > 0 ? 'green' : 'red'},
+            ]}>
+            {assetChange}
           </Text>
         </View>
       </View>
