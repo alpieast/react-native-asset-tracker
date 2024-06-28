@@ -25,12 +25,19 @@ const AssetItem = ({asset}: {asset: CoinData}) => {
           <Text style={styles.symbol}>{asset.symbol}</Text>
         </View>
         <View style={styles.priceContainer}>
-          <Text style={styles.price}>{assetPrice}</Text>
+          <Text style={styles.price}>$ {assetPrice}</Text>
           <Text
             style={[
               styles.change,
-              {color: asset.quote.USD.percent_change_24h > 0 ? 'green' : 'red'},
+              {
+                color:
+                  asset.quote.USD.percent_change_24h !== 0 &&
+                  asset.quote.USD.percent_change_24h > 0
+                    ? 'green'
+                    : 'red',
+              },
             ]}>
+            {asset.quote.USD.percent_change_24h > 0 ? '+' : ''}
             {assetChange}
           </Text>
         </View>
@@ -75,9 +82,11 @@ const styles = StyleSheet.create({
   price: {
     fontSize: 16,
     fontWeight: 'bold',
+    color: '#343A40',
   },
   change: {
     fontSize: 14,
+    paddingTop: 6,
   },
 });
 

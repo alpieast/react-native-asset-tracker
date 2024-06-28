@@ -3,6 +3,7 @@ import {View, Text, StyleSheet, Image} from 'react-native';
 import {RouteProp} from '@react-navigation/native';
 import {RootStackParamList} from '../navigation/types';
 import {LineChart} from 'react-native-gifted-charts';
+import {CoinData} from '../services/types';
 
 type AssetDetailScreenRouteProp = RouteProp<
   RootStackParamList,
@@ -12,8 +13,17 @@ type AssetDetailScreenRouteProp = RouteProp<
 type Props = {
   route: AssetDetailScreenRouteProp;
 };
+
 const AssetDetailScreen = ({route}: Props) => {
   const {asset} = route.params;
+
+  const assetPrice: string = asset.quote.USD.price.toFixed(2);
+  const assetChangePercent: string =
+    asset.quote.USD.percent_change_24h.toFixed(2) + '%';
+  const assetChangePercentToValue: string = (
+    (asset.quote.USD.price * asset.quote.USD.percent_change_24h) /
+    100
+  ).toFixed(2);
 
   const lineData = [
     {value: 100, time: '1'},
@@ -37,9 +47,20 @@ const AssetDetailScreen = ({route}: Props) => {
         {/* <Image source={{uri: asset.icon}} style={styles.icon} />
         <Text style={styles.name}>{asset.name}</Text>
         <Text style={styles.symbol}>({asset.symbol})</Text> */}
-        <Text style={styles.price}>{asset.price}</Text>
-        <Text style={[styles.change, {color: asset.changeColor}]}>
-          {asset.change}
+        <Text style={styles.price}>$ {assetPrice}</Text>
+        <Text
+          style={[
+            styles.change,
+            {
+              color:
+                asset.quote.USD.percent_change_24h !== 0 &&
+                asset.quote.USD.percent_change_24h > 0
+                  ? 'green'
+                  : 'red',
+            },
+          ]}>
+          {asset.quote.USD.percent_change_24h > 0 ? '+' : ''}
+          {assetChangePercentToValue}({assetChangePercent})
         </Text>
       </View>
 
@@ -97,19 +118,20 @@ const AssetDetailScreen = ({route}: Props) => {
         <Text style={styles.statsTitle}>Market Stats</Text>
         <View style={styles.statRow}>
           <Text style={styles.statLabel}>Market Cap</Text>
-          <Text style={styles.statValue}>10</Text>
+          <Text style={styles.statValue}>{asset.quote.USD.market_cap}</Text>
         </View>
         <View style={styles.statRow}>
-          <Text style={styles.statLabel}>Volume</Text>
-          <Text style={styles.statValue}>100</Text>
+          <Text style={styles.statLabel}>Volume(24H)</Text>
+          <Text style={styles.statValue}>{asset.quote.USD.volume_24h}</Text>
         </View>
         <View style={styles.statRow}>
           <Text style={styles.statLabel}>Circulating Supply</Text>
-          <Text style={styles.statValue}>1000</Text>
+          <Text style={styles.statValue}>{asset.circulating_supply}</Text>
         </View>
         <View style={styles.statRow}>
           <Text style={styles.statLabel}>Popularity</Text>
-          <Text style={styles.statValue}>low</Text>
+
+          <Text style={styles.statValue}>Medium</Text>
         </View>
       </View>
     </View>
@@ -140,13 +162,14 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   price: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: 'bold',
     marginVertical: 8,
+    color: '#212529',
   },
   change: {
-    fontSize: 16,
-    marginBottom: 16,
+    fontSize: 12,
+    paddingLeft: 3,
   },
   chartContainer: {
     height: 200,

@@ -21,8 +21,10 @@ export interface CoinData {
   symbol: string;
   slug: string;
   num_market_pairs: number;
+  circulating_supply: number;
   date_added: string;
   quote: {USD: Quote};
+  cmc_rank: number;
 }
 
 interface Status {

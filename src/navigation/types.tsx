@@ -1,6 +1,6 @@
-import {AssetType} from '../screens/AssetsScreen';
+import {CoinData} from '../services/types';
 
 export type RootStackParamList = {
   AssetsScreen: undefined;
-  AssetDetailScreen: {asset: AssetType};
+  AssetDetailScreen: {asset: CoinData};
 };
