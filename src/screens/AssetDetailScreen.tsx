@@ -2,6 +2,7 @@ import React from 'react';
 import {View, Text, StyleSheet, Image} from 'react-native';
 import {RouteProp} from '@react-navigation/native';
 import {RootStackParamList} from '../navigation/types';
+import {LineChart} from 'react-native-gifted-charts';
 
 type AssetDetailScreenRouteProp = RouteProp<
   RootStackParamList,
@@ -11,26 +12,86 @@ type AssetDetailScreenRouteProp = RouteProp<
 type Props = {
   route: AssetDetailScreenRouteProp;
 };
-
 const AssetDetailScreen = ({route}: Props) => {
   const {asset} = route.params;
+
+  const lineData = [
+    {value: 100, time: '1'},
+    {value: 70, time: '2'},
+    {value: 120, time: '3'},
+    {value: 90, time: '4'},
+    {value: 120, time: '5'},
+    {value: 50, time: '6'},
+    {value: 100, time: '7'},
+    {value: 110, time: '8'},
+    {value: 160, time: '9'},
+    {value: 150, time: '10'},
+    {value: 100, time: '11'},
+    {value: 80, time: '12'},
+    {value: 120, time: '13'},
+  ];
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Image source={{uri: asset.icon}} style={styles.icon} />
+        {/* <Image source={{uri: asset.icon}} style={styles.icon} />
         <Text style={styles.name}>{asset.name}</Text>
-        <Text style={styles.symbol}>({asset.symbol})</Text>
+        <Text style={styles.symbol}>({asset.symbol})</Text> */}
+        <Text style={styles.price}>{asset.price}</Text>
+        <Text style={[styles.change, {color: asset.changeColor}]}>
+          {asset.change}
+        </Text>
       </View>
-      <Text style={styles.price}>{asset.price}</Text>
-      <Text style={[styles.change, {color: asset.changeColor}]}>
-        {asset.change}
-      </Text>
+
       <View style={styles.chartContainer}>
         {/* Replace this View with your chart component */}
-        <View style={styles.chartPlaceholder}>
-          <Text>Chart Placeholder</Text>
-        </View>
+        <LineChart
+          focusEnabled
+          showDataPointOnFocus
+          showTextOnFocus
+          focusedCustomDataPoint={() => {
+            return {
+              value: 100,
+              time: '7',
+            };
+          }}
+          focusedDataPointColor={'#0063F5'}
+          focusedDataPointRadius={8}
+          focusedDataPointWidth={2}
+          focusedDataPointHeight={10}
+          focusedDataPointShape="circle"
+          onFocus={() => {
+            console.log('Focused');
+          }}
+          curved
+          data={lineData}
+          spacing={30}
+          hideDataPoints
+          thickness={2}
+          hideRules
+          hideYAxisText
+          yAxisColor={'#fff'}
+          yAxisTextStyle={{color: '#fff'}}
+          xAxisLabelTexts={[
+            '1',
+            '2',
+            '3',
+            '4',
+            '5',
+            '6',
+            '7',
+            '8',
+            '9',
+            '10',
+            '11',
+            '12',
+            '13',
+          ]}
+          color="#0063F5"
+          animateOnDataChange
+          animationDuration={1000}
+          animationEasing="ease-in-out"
+        />
       </View>
       <View style={styles.statsContainer}>
         <Text style={styles.statsTitle}>Market Stats</Text>
@@ -58,12 +119,12 @@ const AssetDetailScreen = ({route}: Props) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
     backgroundColor: '#fff',
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
+    padding: 16,
   },
   icon: {
     width: 40,
@@ -98,9 +159,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f0f0f0',
   },
   statsContainer: {
-    borderTopWidth: 1,
-    borderTopColor: '#ccc',
-    paddingTop: 16,
+    padding: 16,
   },
   statsTitle: {
     fontSize: 18,
