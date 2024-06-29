@@ -1,4 +1,4 @@
-import {KlineDataType} from './types';
+import {AllAssetsResponse, KlineData, KlineDataType} from './types';
 
 export const transformDataResponseToKlineData = (data: KlineDataType[]) => {
   return data.map(item => ({
@@ -30,7 +30,11 @@ const closeTimeUnixToDateString = (closeTime: number, interval: string) => {
   return `${day < 10 ? `0${day}` : day}/${month < 10 ? `0${month}` : month}`;
 };
 
-export const apiDataToChartData = (data: any[], interval: string) => {
+export const apiDataToChartData = (
+  data: KlineData[],
+  interval: string,
+  isMini?: boolean,
+) => {
   return data.map((item, index) => {
     const dataPointText = `${parseFloat(item.closePrice)}`;
 
@@ -38,7 +42,19 @@ export const apiDataToChartData = (data: any[], interval: string) => {
       value: parseFloat(item.closePrice),
       dataPointText,
       date: item.closeTime,
-      label: closeTimeUnixToDateString(item.closeTime, interval),
+      label: isMini ? '' : closeTimeUnixToDateString(item.closeTime, interval),
     };
   });
+};
+
+export const findMinMax = (data: any[]) => {
+  let min = data[0];
+  let max = data[0];
+
+  const sortedData = data.sort((a, b) => a - b);
+
+  min = sortedData[0];
+  max = sortedData[sortedData.length - 1];
+
+  return {min, max};
 };

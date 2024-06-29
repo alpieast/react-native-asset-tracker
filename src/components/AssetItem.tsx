@@ -3,6 +3,7 @@ import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {TouchableOpacity, View, Text, StyleSheet, Image} from 'react-native';
 import {RootStackParamList} from '../navigation/types';
 import {CoinData} from '../services/types';
+import AssetDetailLineChart from './AssetLineChart';
 
 const AssetItem = ({asset}: {asset: CoinData}) => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -24,22 +25,25 @@ const AssetItem = ({asset}: {asset: CoinData}) => {
           <Text style={styles.name}>{asset.name}</Text>
           <Text style={styles.symbol}>{asset.symbol}</Text>
         </View>
-        <View style={styles.priceContainer}>
-          <Text style={styles.price}>$ {assetPrice}</Text>
-          <Text
-            style={[
-              styles.change,
-              {
-                color:
-                  asset.quote.USD.percent_change_24h !== 0 &&
-                  asset.quote.USD.percent_change_24h > 0
-                    ? 'green'
-                    : 'red',
-              },
-            ]}>
-            {asset.quote.USD.percent_change_24h > 0 ? '+' : ''}
-            {assetChange}
-          </Text>
+        <View style={styles.chartAndPriceContainer}>
+          <AssetDetailLineChart asset={asset} isMini />
+          <View style={styles.priceContainer}>
+            <Text style={styles.price}>$ {assetPrice}</Text>
+            <Text
+              style={[
+                styles.change,
+                {
+                  color:
+                    asset.quote.USD.percent_change_24h !== 0 &&
+                    asset.quote.USD.percent_change_24h > 0
+                      ? 'green'
+                      : 'red',
+                },
+              ]}>
+              {asset.quote.USD.percent_change_24h > 0 ? '+' : ''}
+              {assetChange}
+            </Text>
+          </View>
         </View>
       </View>
     </TouchableOpacity>
@@ -59,14 +63,19 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
     borderRadius: 8,
+    paddingHorizontal: 16,
   },
   icon: {
     width: 40,
     height: 40,
-    margin: 16,
+    marginRight: 16,
   },
   infoContainer: {
     flex: 1,
+  },
+  chartAndPriceContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   name: {
     fontSize: 14,
@@ -77,7 +86,7 @@ const styles = StyleSheet.create({
   },
   priceContainer: {
     alignItems: 'flex-end',
-    marginRight: 14,
+    width: 110,
   },
   price: {
     fontSize: 16,
@@ -89,5 +98,4 @@ const styles = StyleSheet.create({
     paddingTop: 6,
   },
 });
-
 export default AssetItem;

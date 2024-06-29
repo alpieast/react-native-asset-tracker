@@ -68,17 +68,6 @@ const styles = StyleSheet.create({
     paddingTop: 12,
     padding: 16,
   },
-  fixedLoading: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 10,
-    backgroundColor: '#F8F9FA80',
-  },
   title: {
     fontSize: 20,
     lineHeight: 20,
