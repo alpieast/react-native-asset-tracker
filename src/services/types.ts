@@ -48,3 +48,39 @@ export interface AllAssetsResponse {
   messageDetail: null;
   data: {body: Body};
 }
+
+export enum Interval {
+  ONE_HOUR = '1h',
+  ONE_DAY = '1d',
+  ONE_WEEK = '1w',
+  ONE_MONTH = '1M',
+}
+
+export type KlineDataType = [
+  number, // Kline open time
+  string, // Open price
+  string, // High price
+  string, // Low price
+  string, // Close price
+  string, // Volume
+  number, // Kline close time
+  string, // Quote asset volume
+  number, // Number of trades
+  string, // Taker buy base asset volume
+  string, // Taker buy quote asset volume
+  string, // Ignore.
+];
+export interface KlineData {
+  openTime: number;
+  open: string;
+  high: string;
+  low: string;
+  closePrice: string;
+  volume: string;
+  closeTime: number;
+  quoteAssetVolume: string;
+  numberOfTrades: number;
+  takerBuyBaseAssetVolume: string;
+  takerBuyQuoteAssetVolume: string;
+  ignore?: string;
+}
