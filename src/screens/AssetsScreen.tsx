@@ -24,6 +24,8 @@ const AssetsList = () => {
   const limit = 10;
   const [startPoint, setStartPoint] = useState<number>(1);
 
+  const latestData = new Map<string, WebSocketMessage>();
+
   const fetchAssets = async (increase: number) => {
     setLoading(true);
     await apiService
@@ -55,38 +57,39 @@ const AssetsList = () => {
       LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     });
 
-    let lastMessageTimestamp = 0;
-    const messageInterval = 1000;
+    const messageInterval = 60000; // 1 minute in milliseconds
 
     const handleWebSocketMessage = (data: WebSocketMessage) => {
-      const now = Date.now();
-      if (now - lastMessageTimestamp >= messageInterval) {
-        console.log('WebSocket message:', data);
-
-        setAssets(prevAssets =>
-          prevAssets.map(asset =>
-            `${asset.symbol.toUpperCase()}USDT` === data.s
-              ? {
-                  ...asset,
-                  quote: {
-                    ...asset.quote,
-                    USD: {
-                      ...asset.quote.USD,
-                      price: parseFloat(data.w),
-                    },
-                  },
-                }
-              : asset,
-          ),
-        );
-        lastMessageTimestamp = now;
-      }
+      latestData.set(data.s, data);
     };
 
     wsService.onMessage(handleWebSocketMessage);
 
+    const intervalId = setInterval(() => {
+      setAssets(prevAssets =>
+        prevAssets.map(asset => {
+          const data = latestData.get(`${asset.symbol.toUpperCase()}USDT`);
+          if (data) {
+            return {
+              ...asset,
+              quote: {
+                ...asset.quote,
+                USD: {
+                  ...asset.quote.USD,
+                  price: parseFloat(data.w),
+                },
+              },
+            };
+          }
+          return asset;
+        }),
+      );
+      latestData.clear();
+    }, messageInterval);
+
     return () => {
       wsService.disconnect();
+      clearInterval(intervalId);
     };
   }, []);
 

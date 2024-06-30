@@ -1,6 +1,13 @@
-import React, {useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
-import {TouchableOpacity, View, Text, StyleSheet, Image} from 'react-native';
+import {
+  TouchableOpacity,
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  Animated,
+} from 'react-native';
 import {RootStackParamList} from '../navigation/types';
 import {CoinData} from '../services/types';
 import AssetDetailLineChart from './AssetLineChart';
@@ -10,11 +17,15 @@ const AssetItem = ({asset}: {asset: CoinData}) => {
 
   const assetIconLink: string = `https://s2.coinmarketcap.com/static/img/coins/64x64/${asset.id}.png`;
 
-  const assetPrice: string = asset.quote.USD.price.toFixed(2);
-  const assetChange: string =
-    asset.quote.USD.percent_change_24h.toFixed(2) + '%';
+  const assetPrice = asset.quote.USD.price.toFixed(2);
+  const assetChange = asset.quote.USD.percent_change_24h.toFixed(2) + '%';
+
+  const [previousPrice, setPreviousPrice] = useState<number | null>(null);
+  const [flashColor, setFlashColor] = useState<string>('transparent');
 
   const [disabled, setDisabled] = useState<boolean>(false);
+
+  const flashAnim = useRef(new Animated.Value(0)).current;
 
   const assetImage = (
     <Image source={{uri: assetIconLink}} style={styles.imageForHeader} />
@@ -32,6 +43,40 @@ const AssetItem = ({asset}: {asset: CoinData}) => {
     });
   };
 
+  useEffect(() => {
+    if (previousPrice !== null) {
+      if (parseFloat(assetPrice) > previousPrice) {
+        setFlashColor('lightgreen');
+      } else if (parseFloat(assetPrice) < previousPrice) {
+        setFlashColor('red');
+      } else {
+        setFlashColor('transparent');
+      }
+
+      Animated.sequence([
+        Animated.timing(flashAnim, {
+          toValue: 1,
+          duration: 500,
+          useNativeDriver: false,
+        }),
+        Animated.timing(flashAnim, {
+          toValue: 0,
+          duration: 500,
+          useNativeDriver: false,
+        }),
+      ]).start();
+    }
+    setPreviousPrice(parseFloat(assetPrice));
+  }, [assetPrice]);
+
+  const flashStyle = {
+    paddingHorizontal: 0,
+    backgroundColor: flashAnim.interpolate({
+      inputRange: [0, 1],
+      outputRange: ['transparent', flashColor],
+    }),
+  };
+
   return (
     <TouchableOpacity onPress={onPress} disabled={disabled}>
       <View style={[styles.container, disabled && styles.disabledContainer]}>
@@ -46,8 +91,11 @@ const AssetItem = ({asset}: {asset: CoinData}) => {
             isMini
             setDisabled={setDisabled}
           />
+
           <View style={styles.priceContainer}>
-            <Text style={styles.price}>$ {assetPrice}</Text>
+            <Animated.View style={flashStyle}>
+              <Text style={styles.price}>$ {assetPrice}</Text>
+            </Animated.View>
             <Text
               style={[
                 styles.change,
