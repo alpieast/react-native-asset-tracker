@@ -1,4 +1,10 @@
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {
+  ActivityIndicator,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import {LineChart, lineDataItem} from 'react-native-gifted-charts';
 import {CoinData, Interval} from '../services/types';
 import {useEffect, useState} from 'react';
@@ -12,11 +18,15 @@ import {
 const AssetDetailLineChart = ({
   asset,
   isMini,
+  setDisabled,
 }: {
   asset: CoinData;
   isMini?: boolean;
+  setDisabled?: (value: boolean) => void;
 }) => {
   const apiService = ApiService.getInstance();
+
+  const [loading, setLoading] = useState<boolean>(true);
 
   const [lineData, setLineData] = useState<lineDataItem[]>([]);
   const [interval, setInterval] = useState<Interval>(
@@ -28,17 +38,26 @@ const AssetDetailLineChart = ({
 
   useEffect(() => {
     const fetchAsset = async () => {
-      const assetResponse = await apiService.getAssetDetailByName(
-        asset.symbol,
-        interval,
-      );
-      const chartData = apiDataToChartData(assetResponse, interval, isMini);
-      setLineData(chartData);
+      setLoading(true);
+      await apiService
+        .getAssetDetailByName(asset.symbol, interval)
+        .then(response => {
+          const chartData = apiDataToChartData(response, interval, isMini);
+          setLineData(chartData);
 
-      const {min, max} = findMinMax(chartData);
+          const {min, max} = findMinMax(chartData);
 
-      setMaxValue(max);
-      setMinValue(min);
+          setMaxValue(max);
+          setMinValue(min);
+        })
+        .catch(error => {
+          console.log(error);
+          if (setDisabled) setDisabled(true);
+        })
+        .finally(() => {
+          console.log('Asset detail fetched');
+          setLoading(false);
+        });
     };
 
     fetchAsset();
@@ -46,38 +65,49 @@ const AssetDetailLineChart = ({
 
   return (
     <View style={isMini ? styles.miniChartContainer : styles.chartContainer}>
-      <LineChart
-        maxValue={isMini ? maxValue : undefined}
-        mostNegativeValue={isMini ? minValue : undefined}
-        yAxisOffset={10}
-        focusEnabled
-        showDataPointOnFocus
-        showTextOnFocus
-        curved
-        scrollToEnd={!isMini}
-        data={lineData}
-        thickness={2}
-        adjustToWidth={isMini}
-        hideRules
-        hideYAxisText
-        yAxisColor={'#fff'}
-        hideAxesAndRules={isMini}
-        showXAxisIndices={!isMini}
-        color={
-          isMini
-            ? findLastIsPositive(lineData)
-              ? '#21BF73'
-              : '#D90429'
-            : '#0063F5'
-        }
-        animateOnDataChange
-        animationDuration={1000}
-        animationEasing="ease-in-out"
-        dataPointsHeight={-30}
-        dataPointsWidth={40}
-        height={isMini ? 25 : 345}
-        width={isMini ? 80 : undefined}
-      />
+      {loading ? (
+        isMini ? (
+          <ActivityIndicator size="small" color="#000" />
+        ) : (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#0000ff" />
+            <Text>Loading asset detail...</Text>
+          </View>
+        )
+      ) : (
+        <LineChart
+          maxValue={isMini ? maxValue : undefined}
+          mostNegativeValue={isMini ? minValue : undefined}
+          focusEnabled
+          showDataPointOnFocus
+          showTextOnFocus
+          curved
+          scrollToEnd={!isMini}
+          data={lineData}
+          thickness={2}
+          adjustToWidth={isMini}
+          hideRules
+          hideYAxisText
+          yAxisColor={'#fff'}
+          hideAxesAndRules={isMini}
+          showXAxisIndices={!isMini}
+          color={
+            isMini
+              ? findLastIsPositive(lineData)
+                ? '#21BF73'
+                : '#D90429'
+              : '#0063F5'
+          }
+          animateOnDataChange
+          animationDuration={1000}
+          animationEasing="ease-in-out"
+          dataPointsHeight={-30}
+          dataPointsWidth={40}
+          height={isMini ? 25 : 345}
+          width={isMini ? 80 : undefined}
+        />
+      )}
+
       {!isMini && (
         <View style={styles.buttonGroup}>
           {Object.values(Interval).map(value => (
@@ -106,6 +136,12 @@ const AssetDetailLineChart = ({
 const styles = StyleSheet.create({
   chartContainer: {
     marginBottom: 16,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 345,
   },
   miniChartContainer: {
     width: 80,

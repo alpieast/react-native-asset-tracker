@@ -4,6 +4,7 @@ import {createStackNavigator} from '@react-navigation/stack';
 import AssetsScreen from '../screens/AssetsScreen';
 import AssetDetailScreen from '../screens/AssetDetailScreen';
 import {RootStackParamList} from './types';
+import CustomNavigationHeader from '../components/CustomNavigationHeader';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -19,7 +20,16 @@ const AppNavigator = () => {
         <Stack.Screen
           name="AssetDetailScreen"
           component={AssetDetailScreen}
-          options={{title: 'Asset Detail'}}
+          options={({route}) => ({
+            header: () => (
+              <CustomNavigationHeader
+                title={route.params.asset.name}
+                symbol={`(${route.params.asset.symbol})`}
+                assetIconComponent={route.params.assetImage}
+                backButton={route.params.backButton}
+              />
+            ),
+          })}
         />
       </Stack.Navigator>
     </NavigationContainer>

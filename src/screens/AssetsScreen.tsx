@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
   FlatList,
   StyleSheet,
@@ -7,6 +7,7 @@ import {
   LayoutAnimation,
   Platform,
   UIManager,
+  ActivityIndicator,
 } from 'react-native';
 import AssetItem from '../components/AssetItem';
 import {CoinData} from '../services/types';
@@ -20,19 +21,24 @@ const AssetsList = () => {
   const limit = 10;
   const [startPoint, setStartPoint] = useState<number>(1);
 
-  const fetchAssets = async () => {
+  const fetchAssets = async (increase: number) => {
     setLoading(true);
-    const assetsResponse = await apiService.getAssetsWithPagination(
-      limit,
-      startPoint,
-    );
-
-    setAssets(assetsResponse.data.body.data);
-    setLoading(false);
+    await apiService
+      .getAssetsWithPagination(limit, startPoint + increase)
+      .then(response => {
+        setAssets(prev => [...prev, ...response.data.body.data]);
+        setStartPoint(startPoint + increase);
+      })
+      .catch(error => {
+        console.log(error);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
   useEffect(() => {
-    fetchAssets().then(() => {
+    fetchAssets(0).then(() => {
       if (Platform.OS === 'android') {
         if (UIManager.setLayoutAnimationEnabledExperimental) {
           UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -43,9 +49,9 @@ const AssetsList = () => {
     });
   }, []);
 
-  const renderItem = ({item}: {item: CoinData}) => {
+  const renderItem = useCallback(({item}: {item: CoinData}) => {
     return <AssetItem asset={item} />;
-  };
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -56,8 +62,22 @@ const AssetsList = () => {
         keyExtractor={item => item.symbol}
         style={styles.flatList}
         refreshing={loading}
-        onEndReached={() => console.log('End reached')}
+        onEndReached={() => {
+          if (!loading) fetchAssets(limit);
+        }}
+        getItemLayout={(data, index) => ({
+          length: 100,
+          offset: 10 * index,
+          index,
+        })}
+        onEndReachedThreshold={0.5}
       />
+      {loading && (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#0000ff" />
+          <Text>Loading assets...</Text>
+        </View>
+      )}
     </View>
   );
 };
@@ -77,6 +97,16 @@ const styles = StyleSheet.create({
   flatList: {
     flex: 1,
     paddingTop: 16,
+  },
+  loadingContainer: {
+    position: 'absolute',
+    padding: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F8F9FA80',
+    bottom: 0,
+    height: 50,
+    width: '100%',
   },
 });
 

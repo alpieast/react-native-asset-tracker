@@ -1,32 +1,51 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {TouchableOpacity, View, Text, StyleSheet, Image} from 'react-native';
 import {RootStackParamList} from '../navigation/types';
 import {CoinData} from '../services/types';
 import AssetDetailLineChart from './AssetLineChart';
 
-const AssetItem = ({asset}: {asset: CoinData}) => {
+const AssetItem = React.memo(({asset}: {asset: CoinData}) => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-  const onPress = () => {
-    navigation.navigate('AssetDetailScreen', {asset});
-  };
 
-  const assetIcon: string = `https://s2.coinmarketcap.com/static/img/coins/64x64/${asset.id}.png`;
+  const assetIconLink: string = `https://s2.coinmarketcap.com/static/img/coins/64x64/${asset.id}.png`;
 
   const assetPrice: string = asset.quote.USD.price.toFixed(2);
   const assetChange: string =
     asset.quote.USD.percent_change_24h.toFixed(2) + '%';
 
+  const [disabled, setDisabled] = useState<boolean>(false);
+
+  const assetImage = (
+    <Image source={{uri: assetIconLink}} style={styles.imageForHeader} />
+  );
+
+  const backButton = (
+    <Image source={require('../assets/icons/backButton.png')} />
+  );
+
+  const onPress = () => {
+    navigation.navigate('AssetDetailScreen', {
+      asset,
+      assetImage,
+      backButton,
+    });
+  };
+
   return (
-    <TouchableOpacity onPress={onPress}>
-      <View style={styles.container}>
-        <Image source={{uri: assetIcon}} style={styles.icon} />
+    <TouchableOpacity onPress={onPress} disabled={disabled}>
+      <View style={[styles.container, disabled && styles.disabledContainer]}>
+        <Image source={{uri: assetIconLink}} style={styles.icon} />
         <View style={styles.infoContainer}>
           <Text style={styles.name}>{asset.name}</Text>
           <Text style={styles.symbol}>{asset.symbol}</Text>
         </View>
         <View style={styles.chartAndPriceContainer}>
-          <AssetDetailLineChart asset={asset} isMini />
+          <AssetDetailLineChart
+            asset={asset}
+            isMini
+            setDisabled={setDisabled}
+          />
           <View style={styles.priceContainer}>
             <Text style={styles.price}>$ {assetPrice}</Text>
             <Text
@@ -48,7 +67,7 @@ const AssetItem = ({asset}: {asset: CoinData}) => {
       </View>
     </TouchableOpacity>
   );
-};
+});
 
 const styles = StyleSheet.create({
   container: {
@@ -65,10 +84,19 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 16,
   },
+  disabledContainer: {
+    opacity: 0.8,
+  },
   icon: {
     width: 40,
     height: 40,
     marginRight: 16,
+  },
+  imageForHeader: {
+    width: 24,
+    height: 24,
+    marginLeft: 16,
+    marginRight: 8,
   },
   infoContainer: {
     flex: 1,
@@ -98,4 +126,5 @@ const styles = StyleSheet.create({
     paddingTop: 6,
   },
 });
+
 export default AssetItem;
