@@ -1,18 +1,16 @@
-interface Quote {
-  price: number;
-  volume_24h: number;
-  volume_change_24h: number;
-  percent_change_1h: number;
-  percent_change_24h: number;
-  percent_change_7d: number;
-  percent_change_30d: number;
-  percent_change_60d: number;
-  percent_change_90d: number;
-  market_cap: number;
-  market_cap_dominance: number;
-  fully_diluted_market_cap: number;
-  tvl: null;
-  last_updated: string;
+export interface Quote {
+  USD: {
+    price: number;
+    volume_24h: number;
+    volume_change_24h: number;
+    percent_change_1h: number;
+    percent_change_24h: number;
+    percent_change_7d: number;
+    market_cap: number;
+    market_cap_dominance: number;
+    fully_diluted_market_cap: number;
+    last_updated: string;
+  };
 }
 
 export interface CoinData {
@@ -23,8 +21,8 @@ export interface CoinData {
   num_market_pairs: number;
   circulating_supply: number;
   date_added: string;
-  quote: {USD: Quote};
   cmc_rank: number;
+  quote: Quote;
 }
 
 interface Status {
@@ -83,4 +81,13 @@ export interface KlineData {
   takerBuyBaseAssetVolume: string;
   takerBuyQuoteAssetVolume: string;
   ignore?: string;
+}
+
+export interface WebSocketMessage {
+  e: string; // Event type
+  E: number; // Event time
+  s: string; // Symbol
+  i: string; // Average price interval
+  w: string; // Average price
+  T: number; // Last trade time
 }

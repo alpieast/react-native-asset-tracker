@@ -1,3 +1,4 @@
+// AssetsList.tsx
 import React, {useCallback, useEffect, useState} from 'react';
 import {
   FlatList,
@@ -10,11 +11,13 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import AssetItem from '../components/AssetItem';
-import {CoinData} from '../services/types';
+import {CoinData, WebSocketMessage} from '../services/types';
 import ApiService from '../services/apiService';
+import WebSocketService from '../services/websocket';
 
 const AssetsList = () => {
   const apiService = ApiService.getInstance();
+  const wsService = WebSocketService.getInstance();
 
   const [assets, setAssets] = useState<CoinData[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -26,8 +29,12 @@ const AssetsList = () => {
     await apiService
       .getAssetsWithPagination(limit, startPoint + increase)
       .then(response => {
-        setAssets(prev => [...prev, ...response.data.body.data]);
+        const newAssets = response.data.body.data;
+        setAssets(prev => [...prev, ...newAssets]);
         setStartPoint(startPoint + increase);
+
+        const symbols = newAssets.map(asset => asset.symbol.toLowerCase());
+        wsService.connect(symbols);
       })
       .catch(error => {
         console.log(error);
@@ -47,6 +54,40 @@ const AssetsList = () => {
 
       LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     });
+
+    let lastMessageTimestamp = 0;
+    const messageInterval = 1000;
+
+    const handleWebSocketMessage = (data: WebSocketMessage) => {
+      const now = Date.now();
+      if (now - lastMessageTimestamp >= messageInterval) {
+        console.log('WebSocket message:', data);
+
+        setAssets(prevAssets =>
+          prevAssets.map(asset =>
+            `${asset.symbol.toUpperCase()}USDT` === data.s
+              ? {
+                  ...asset,
+                  quote: {
+                    ...asset.quote,
+                    USD: {
+                      ...asset.quote.USD,
+                      price: parseFloat(data.w),
+                    },
+                  },
+                }
+              : asset,
+          ),
+        );
+        lastMessageTimestamp = now;
+      }
+    };
+
+    wsService.onMessage(handleWebSocketMessage);
+
+    return () => {
+      wsService.disconnect();
+    };
   }, []);
 
   const renderItem = useCallback(({item}: {item: CoinData}) => {
