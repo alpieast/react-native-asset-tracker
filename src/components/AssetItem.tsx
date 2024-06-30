@@ -5,7 +5,7 @@ import {RootStackParamList} from '../navigation/types';
 import {CoinData} from '../services/types';
 import AssetDetailLineChart from './AssetLineChart';
 
-const AssetItem = React.memo(({asset}: {asset: CoinData}) => {
+const AssetItem = ({asset}: {asset: CoinData}) => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
   const assetIconLink: string = `https://s2.coinmarketcap.com/static/img/coins/64x64/${asset.id}.png`;
@@ -67,7 +67,7 @@ const AssetItem = React.memo(({asset}: {asset: CoinData}) => {
       </View>
     </TouchableOpacity>
   );
-});
+};
 
 const styles = StyleSheet.create({
   container: {

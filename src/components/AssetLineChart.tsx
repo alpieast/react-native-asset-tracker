@@ -98,7 +98,6 @@ const AssetDetailLineChart = ({
                 : '#D90429'
               : '#0063F5'
           }
-          animateOnDataChange
           animationDuration={1000}
           animationEasing="ease-in-out"
           dataPointsHeight={-30}

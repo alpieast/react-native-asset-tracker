@@ -45,8 +45,6 @@ class ApiService {
 
       return transformDataResponseToKlineData(response.data);
     } catch (error) {
-      console.log(error);
-
       throw error;
     }
   }
