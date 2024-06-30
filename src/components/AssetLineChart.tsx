@@ -3,7 +3,11 @@ import {LineChart, lineDataItem} from 'react-native-gifted-charts';
 import {CoinData, Interval} from '../services/types';
 import {useEffect, useState} from 'react';
 import ApiService from '../services/apiService';
-import {apiDataToChartData, findMinMax} from '../services/helper';
+import {
+  apiDataToChartData,
+  findLastIsPositive,
+  findMinMax,
+} from '../services/helper';
 
 const AssetDetailLineChart = ({
   asset,
@@ -31,31 +35,10 @@ const AssetDetailLineChart = ({
       const chartData = apiDataToChartData(assetResponse, interval, isMini);
       setLineData(chartData);
 
-      const values = chartData.map(item => {
-        return item.value;
-      });
+      const {min, max} = findMinMax(chartData);
 
-      const {min, max} = findMinMax(values);
-
-      const minimumVerticalRange = 100;
-
-      const calculatedRange = max - min;
-      let yMin = min;
-      let yMax = max;
-
-      if (calculatedRange < minimumVerticalRange) {
-        const padding = (minimumVerticalRange - calculatedRange) * 2;
-        yMin = minValue - padding;
-        yMax = maxValue + padding;
-        setMaxValue(max + padding);
-        setMinValue(min - padding);
-      } else {
-        const padding = calculatedRange * 0.1;
-        yMin = minValue - padding;
-        yMax = maxValue + padding;
-        setMaxValue(max + padding);
-        setMinValue(min - padding);
-      }
+      setMaxValue(max);
+      setMinValue(min);
     };
 
     fetchAsset();
@@ -80,7 +63,13 @@ const AssetDetailLineChart = ({
         yAxisColor={'#fff'}
         hideAxesAndRules={isMini}
         showXAxisIndices={!isMini}
-        color={isMini ? 'red' : '#0063F5'}
+        color={
+          isMini
+            ? findLastIsPositive(lineData)
+              ? '#21BF73'
+              : '#D90429'
+            : '#0063F5'
+        }
         animateOnDataChange
         animationDuration={1000}
         animationEasing="ease-in-out"

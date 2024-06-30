@@ -46,6 +46,7 @@ const AssetsList = () => {
   const renderItem = ({item}: {item: CoinData}) => {
     return <AssetItem asset={item} />;
   };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Trending Coins</Text>

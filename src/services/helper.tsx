@@ -1,4 +1,5 @@
-import {AllAssetsResponse, KlineData, KlineDataType} from './types';
+import {lineDataItem} from 'react-native-gifted-charts';
+import {KlineData, KlineDataType} from './types';
 
 export const transformDataResponseToKlineData = (data: KlineDataType[]) => {
   return data.map(item => ({
@@ -47,7 +48,11 @@ export const apiDataToChartData = (
   });
 };
 
-export const findMinMax = (data: any[]) => {
+export const findMinMax = (chartData: lineDataItem[]) => {
+  const data = chartData.map(item => {
+    return item.value;
+  });
+
   let min = data[0];
   let max = data[0];
 
@@ -56,5 +61,28 @@ export const findMinMax = (data: any[]) => {
   min = sortedData[0];
   max = sortedData[sortedData.length - 1];
 
+  const minimumVerticalRange = 100;
+  const calculatedRange = max - min;
+
+  if (calculatedRange < minimumVerticalRange) {
+    const padding = (minimumVerticalRange - calculatedRange) * 2;
+    min = min - padding * 2;
+    max = max + padding * 2;
+  } else {
+    const padding = calculatedRange * 0.1;
+    min = min - padding * 2;
+    max = max + padding * 2;
+  }
+
   return {min, max};
+};
+
+export const findLastIsPositive = (lineData: lineDataItem[]) => {
+  if (lineData.length < 2) {
+    return false;
+  }
+  const lastItem = lineData[lineData.length - 1];
+  const lastButOneItem = lineData[lineData.length - 2];
+
+  return lastItem.value > lastButOneItem.value;
 };
