@@ -1,4 +1,18 @@
 {
   "name": "AssetTracker",
-  "displayName": "AssetTracker"
+  "displayName": "AssetTracker",
+  "expo": {
+    "extra": {
+      "eas": {
+        "projectId": "56fa4d31-2d12-4bc3-882c-7dd456b2a182"
+      }
+    },
+    "owner": "alpieast",
+    "runtimeVersion": "1.0.0",
+    "updates": {
+      "url": "https://u.expo.dev/56fa4d31-2d12-4bc3-882c-7dd456b2a182"
+    },
+    "android": {},
+    "ios": {}
+  }
 }
